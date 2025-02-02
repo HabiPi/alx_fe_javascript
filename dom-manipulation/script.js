@@ -11,10 +11,12 @@ let quotes = [
     //
 ];
 
+
 function showRandomQuote() {
     const randomIndex = Math.floor(Math.random() * quotes.length);
-    quoteDisplay.textContent = quotes[randomIndex].text;
+    quoteDisplay.innerHTML = quotes[randomIndex].text; // Use innerHTML
 }
+
 
 function addQuote() {
     const newQuoteText = document.getElementById('newQuoteText').value;
