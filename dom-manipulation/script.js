@@ -3,6 +3,7 @@ const quoteDisplay = document.getElementById('quoteDisplay');
 const newQuoteButton = document.getElementById('newQuoteButton');
 const addQuoteButton = document.getElementById('addQuoteButton');
 const exportQuotesButton = document.getElementById('exportQuotesButton');
+const fileInput = document.getElementById('fileInput');
 
 let quotes = [
     { text: "The only way to do great work is to love what you do.", category: "Inspiration" },
@@ -116,3 +117,35 @@ function addQuote() {
         alert("Please enter both a quote and a category.");
     }
 }
+
+fileInput.addEventListener('change', (event) => {
+    const file = event.target.files[0];
+
+    if (file && file.type.startsWith('text/')) { // Check if it is a text file.
+        const reader = new FileReader(); // Using FileReader
+
+        reader.onload = (e) => {  // Using onload
+            const fileContent = e.target.result;
+            console.log("File Content:", fileContent); // Log the content
+
+            try {
+                const importedQuotes = JSON.parse(fileContent);
+                if (Array.isArray(importedQuotes)) { //Check if the imported file is a valid JSON of quotes
+                    quotes = quotes.concat(importedQuotes); // Add imported quotes
+                    localStorage.setItem('quotes', JSON.stringify(quotes)); // Save to local storage
+                    showRandomQuote(); // Display a new quote
+                    alert("Quotes imported successfully!");
+                } else {
+                    alert("Invalid JSON format. The file should contain an array of quote objects.");
+                }
+            } catch (error) {
+                alert("Error parsing JSON. Please make sure the file contains valid JSON.");
+            }
+
+        };
+
+        reader.readAsText(file); // Using readAsText
+    } else if (file) {
+        alert("Please select a valid text file.");
+    }
+});
