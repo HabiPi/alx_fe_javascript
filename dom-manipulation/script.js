@@ -217,6 +217,16 @@ quoteSearch.addEventListener('input', () => { // Listen for input changes
 const SERVER_URL = 'https://jsonplaceholder.typicode.com/posts'; // Or your mock API endpoint
 const SYNC_INTERVAL = 5000; // 5 seconds (adjust as needed)
 
+function fetchQuotesFromServer() {
+    return fetch(SERVER_URL)
+        .then(response => response.json())
+        .catch(error => {
+            console.error("Error fetching quotes from server:", error);
+            throw error; // Re-throw the error to be caught by the caller
+        });
+}
+
+
 function syncWithServer() {
     fetch(SERVER_URL)
         .then(response => response.json())
