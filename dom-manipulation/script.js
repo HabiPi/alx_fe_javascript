@@ -2,12 +2,13 @@
 const quoteDisplay = document.getElementById('quoteDisplay');
 const newQuoteButton = document.getElementById('newQuoteButton');
 const addQuoteButton = document.getElementById('addQuoteButton');
+const exportQuotesButton = document.getElementById('exportQuotesButton');
 
 let quotes = [
     { text: "The only way to do great work is to love what you do.", category: "Inspiration" },
     { text: "Innovation distinguishes between a leader and a follower.", category: "Leadership" },
     { text: "The future belongs to those who believe in the beauty of their dreams.", category: "Hope" },
-    // Add more initial quotes here
+    // I know I can add more quotes here
 ];
 
 function showRandomQuote() {
@@ -87,6 +88,21 @@ window.addEventListener('DOMContentLoaded', () => {
     showRandomQuote(); // Show initial quote after loading
 });
 
+//the blob is added below
+exportQuotesButton.addEventListener('click', () => {
+    const quotesToExport = JSON.stringify(quotes, null, 2); // Pretty print JSON
+
+    const blob = new Blob([quotesToExport], { type: 'application/json;charset=utf-8' }); // MIME type + charset
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'quotes.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+});
 
 function addQuote() {
     // ... (existing addQuote logic) ...
@@ -96,9 +112,7 @@ function addQuote() {
 
         // Save quotes to localStorage:
         localStorage.setItem('quotes', JSON.stringify(quotes));
-
-        // ... (rest of the existing addQuote logic) ...
     } else {
-      //...
+        alert("Please enter both a quote and a category.");
     }
 }
