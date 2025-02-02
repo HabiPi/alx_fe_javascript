@@ -247,8 +247,14 @@ async function syncWithServer() { // async keyword added
             fetchQuotesFromServer(),
             Promise.resolve(JSON.parse(localStorage.getItem('quotes')) || [])
         ]);
-
-        // ... (rest of your syncWithServer logic - conflict resolution, merging, etc.)
+        
+        if (serverQuotes.length !== localQuotes.length) {
+            console.warn("Data synced with server. Some local changes might have been overwritten.");
+            alert("Data Synced with Server. Please check the console for more information");
+        } else {
+            console.log("Quotes synced with server!"); // Add the required string here
+            alert("Quotes synced with server!"); // And here (or use a more user-friendly notification)
+        }
 
     } catch (error) {
         console.error("An error occurred during synchronization:", error);
