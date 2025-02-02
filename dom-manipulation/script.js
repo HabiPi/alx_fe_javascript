@@ -73,3 +73,32 @@ addQuoteButton.addEventListener('click', () => {
 });
 
 showRandomQuote(); // Display initial quote
+
+
+
+// Load quotes from localStorage when the script loads
+
+
+window.addEventListener('DOMContentLoaded', () => {
+    const storedQuotes = localStorage.getItem('quotes');
+    if (storedQuotes) {
+        quotes = JSON.parse(storedQuotes);
+    }
+    showRandomQuote(); // Show initial quote after loading
+});
+
+
+function addQuote() {
+    // ... (existing addQuote logic) ...
+
+    if (newQuoteText.trim() !== "" && newQuoteCategory.trim() !== "") {
+        // ... (existing quote adding logic) ...
+
+        // Save quotes to localStorage:
+        localStorage.setItem('quotes', JSON.stringify(quotes));
+
+        // ... (rest of the existing addQuote logic) ...
+    } else {
+      //...
+    }
+}
