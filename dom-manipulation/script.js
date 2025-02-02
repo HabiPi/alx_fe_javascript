@@ -188,3 +188,25 @@ fileInput.addEventListener('change', (event) => {
         alert("Please select a valid text file.");
     }
 });
+
+function filterQuote(searchTerm) {
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+    const filteredQuotes = quotes.filter(quote => {
+        const lowerCaseText = quote.text.toLowerCase();
+        return lowerCaseText.includes(lowerCaseSearchTerm);
+    });
+
+    if (filteredQuotes.length === 0) {
+        quoteDisplay.textContent = "No quotes found matching your search.";
+    } else {
+        const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
+        quoteDisplay.textContent = filteredQuotes[randomIndex].text;
+    }
+}
+
+const quoteSearch = document.getElementById('quoteSearch');
+
+quoteSearch.addEventListener('input', () => { // Listen for input changes
+    const searchTerm = quoteSearch.value;
+    filterQuote(searchTerm);
+});
