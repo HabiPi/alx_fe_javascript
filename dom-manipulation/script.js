@@ -315,3 +315,51 @@ window.addEventListener('DOMContentLoaded', () => {
     syncWithServer(); // Initial sync
     setInterval(syncWithServer, SYNC_INTERVAL); // Periodic sync
 });
+
+
+// THE POST, METHOD AND HEADERS
+
+async function addQuote() {
+    const newQuoteText = document.getElementById('newQuoteText').value;
+    const newQuoteCategory = document.getElementById('newQuoteCategory').value;
+
+    if (newQuoteText.trim() !== "" && newQuoteCategory.trim() !== "") {
+        const newQuote = {
+            id: Date.now(),
+            text: newQuoteText,
+            category: newQuoteCategory
+        };
+        quotes.push(newQuote);
+        showRandomQuote();
+        document.getElementById('newQuoteText').value = "";
+        document.getElementById('newQuoteCategory').value = "";
+        document.getElementById('newQuoteForm').style.display = "none";
+        addQuoteButton.style.display = "block";
+
+        localStorage.setItem('quotes', JSON.stringify(quotes));
+
+        try {
+            const response = await fetch(SERVER_URL, {
+                method: 'POST', // Using method: POST
+                headers: {
+                    'Content-Type': 'application/json' // Using Content-Type header
+                },
+                body: JSON.stringify(newQuote) // Sending the new quote in the body
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('Quote added on server:', data);
+
+        } catch (error) {
+            console.error("Error posting quote to server:", error);
+            alert("Error posting quote. Please check the console for more details.");
+        }
+
+    } else {
+        alert("Please enter both a quote and a category.");
+    }
+}
