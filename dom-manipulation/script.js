@@ -210,3 +210,68 @@ quoteSearch.addEventListener('input', () => { // Listen for input changes
     const searchTerm = quoteSearch.value;
     filterQuote(searchTerm);
 });
+
+
+// THE SERVER
+
+const SERVER_URL = 'https://jsonplaceholder.typicode.com/posts'; // Or your mock API endpoint
+const SYNC_INTERVAL = 5000; // 5 seconds (adjust as needed)
+
+function syncWithServer() {
+    fetch(SERVER_URL)
+        .then(response => response.json())
+        .then(serverQuotes => {
+            const localQuotes = JSON.parse(localStorage.getItem('quotes')) || [];
+
+            // Simple conflict resolution: Server data takes precedence
+            const mergedQuotes = serverQuotes.map(serverQuote => {
+                const matchingLocalQuote = localQuotes.find(localQuote => localQuote.id === serverQuote.id);
+                return matchingLocalQuote ? {...serverQuote, ...matchingLocalQuote} : serverQuote;
+            });
+
+            // Add new local quotes not in the server
+            mergedQuotes.push(...localQuotes.filter(localQuote => !mergedQuotes.find(serverQuote => serverQuote.id === localQuote.id)))
+
+            quotes = mergedQuotes;
+            localStorage.setItem('quotes', JSON.stringify(quotes));
+            populateCategories();
+            showRandomQuote();
+
+            // Conflict notification (you can improve this UI-wise)
+            if (serverQuotes.length !== localQuotes.length) {
+                console.warn("Data synced with server. Some local changes might have been overwritten.");
+                alert("Data Synced with Server. Please check the console for more information");
+            }
+
+        })
+        .catch(error => {
+            console.error("Error syncing with server:", error);
+            alert("Error syncing with server. Please check the console for more information");
+        });
+}
+
+
+// Add ID to quotes when adding a new quote
+function addQuote() {
+    // ... (other addQuote logic)
+    const newQuote = {
+        id: Date.now(), // Use timestamp as a simple ID
+        text: newQuoteText,
+        category: newQuoteCategory
+    };
+    quotes.push(newQuote);
+    // ... (rest of addQuote logic)
+}
+
+
+// Initial sync and then periodic sync
+window.addEventListener('DOMContentLoaded', () => {
+    const storedQuotes = localStorage.getItem('quotes');
+    if (storedQuotes) {
+        quotes = JSON.parse(storedQuotes);
+    }
+    populateCategories();
+    showRandomQuote();
+    syncWithServer(); // Initial sync
+    setInterval(syncWithServer, SYNC_INTERVAL); // Periodic sync
+});
