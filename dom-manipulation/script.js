@@ -4,6 +4,9 @@ const newQuoteButton = document.getElementById('newQuoteButton');
 const addQuoteButton = document.getElementById('addQuoteButton');
 const exportQuotesButton = document.getElementById('exportQuotesButton');
 const fileInput = document.getElementById('fileInput');
+const categorySelect = document.createElement('select'); // The select element for categories
+categorySelect.id = 'categoryFilter'; // the ID for filtering
+document.body.insertBefore(categorySelect, quoteDisplay); // Inserted before quoteDisplay
 
 let quotes = [
     { text: "The only way to do great work is to love what you do.", category: "Inspiration" },
@@ -61,6 +64,42 @@ function createAddQuoteForm() {
     document.body.appendChild(formDiv);
     return formDiv;
 }
+
+
+function populateCategories() {
+    const categories = new Set(quotes.map(quote => quote.category)); // Use map and Set
+    categorySelect.innerHTML = ''; // Clear existing options
+    const allOption = document.createElement('option');
+    allOption.value = 'all';
+    allOption.text = 'All Categories';
+    categorySelect.appendChild(allOption);
+    categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.text = category;
+        categorySelect.appendChild(option);
+    });
+}
+
+function categoryFilter(category) {
+    if (category === 'all') {
+        showRandomQuote(); // Show a random quote from all categories
+        return;
+    }
+
+    const filteredQuotes = quotes.filter(quote => quote.category === category);
+    if (filteredQuotes.length === 0) {
+        quoteDisplay.textContent = "No quotes in this category yet.";
+    } else {
+        const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
+        quoteDisplay.textContent = filteredQuotes[randomIndex].text;
+    }
+}
+
+categorySelect.addEventListener('change', () => {
+    const selectedCategory = categorySelect.value;
+    categoryFilter(selectedCategory);
+});
 
 
 newQuoteButton.addEventListener('click', showRandomQuote);
