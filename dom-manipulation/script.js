@@ -17,7 +17,7 @@ let quotes = [
 
 function showRandomQuote() {
     const randomIndex = Math.floor(Math.random() * quotes.length);
-    quoteDisplay.innerHTML = quotes[randomIndex].text; 
+    quoteDisplay.innerHTML = quotes[randomIndex].text;
     // We should rather Use textContent for security purposes
 }
 
@@ -227,6 +227,36 @@ function fetchQuotesFromServer() {
 }
 
 
+async function fetchQuotesFromServer() { // async keyword added
+    try {
+        const response = await fetch(SERVER_URL); // await keyword added
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`); // Improved error handling
+        }
+        const serverQuotes = await response.json(); // await keyword added
+        return serverQuotes;
+    } catch (error) {
+        console.error("Error fetching quotes from server:", error);
+        throw error; // Re-throw the error to be caught by the caller
+    }
+}
+
+async function syncWithServer() { // async keyword added
+    try {
+        const [serverQuotes, localQuotes] = await Promise.all([ // await keyword added
+            fetchQuotesFromServer(),
+            Promise.resolve(JSON.parse(localStorage.getItem('quotes')) || [])
+        ]);
+
+        // ... (rest of your syncWithServer logic - conflict resolution, merging, etc.)
+
+    } catch (error) {
+        console.error("An error occurred during synchronization:", error);
+        alert("An error occurred during synchronization. Please check the console for more details.");
+    }
+}
+
+
 function syncWithServer() {
     fetch(SERVER_URL)
         .then(response => response.json())
@@ -236,7 +266,7 @@ function syncWithServer() {
             // Simple conflict resolution: Server data takes precedence
             const mergedQuotes = serverQuotes.map(serverQuote => {
                 const matchingLocalQuote = localQuotes.find(localQuote => localQuote.id === serverQuote.id);
-                return matchingLocalQuote ? {...serverQuote, ...matchingLocalQuote} : serverQuote;
+                return matchingLocalQuote ? { ...serverQuote, ...matchingLocalQuote } : serverQuote;
             });
 
             // Add new local quotes not in the server
