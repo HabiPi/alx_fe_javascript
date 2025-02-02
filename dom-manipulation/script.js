@@ -256,6 +256,12 @@ async function syncWithServer() { // async keyword added
     }
 }
 
+function syncQuotes() { // The syncQuotes function
+    syncWithServer();
+}
+syncQuotes(); // Initial sync using the new function
+    setInterval(syncQuotes, SYNC_INTERVAL); // Periodic sync using the new function
+});
 
 function syncWithServer() {
     fetch(SERVER_URL)
